@@ -9,12 +9,16 @@ const listingSchema = new mongoose.Schema({
         type: [String],
         required: true,
     },
-    conditions: {
+    types: {
         type: String,
         required: true,
     },
     price: {
         type: Number,
+        required: true,
+    },
+    size: {
+        type: String,
         required: true,
     },
     location: {
@@ -26,8 +30,34 @@ const listingSchema = new mongoose.Schema({
             type: String,
             required: true,
         },
+        state: {
+            type: String,
+            required: true,
+        },
         address: {
             type: String,
+            required: true,
+        }
+    },
+    amenties: {
+        type: [String],
+        required: true,
+    },
+    number: {
+        guestNumber: {
+            type: Number,
+            required: true,
+        },
+        bedroomNumber: {
+            type: Number,
+            required: true,
+        },
+        bedNumber: {
+            type: Number,
+            required: true,
+        },
+        bathroomNumber:{
+            type: Number,
             required: true,
         }
     },
