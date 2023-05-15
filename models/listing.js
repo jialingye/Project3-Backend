@@ -67,5 +67,5 @@ listingSchema.methods.calculateRating = function (){
     }
 }
 
-const Listing = mongoose.model('Listing', userSchema);
+const Listing = mongoose.model('Listing', listingSchema);
 module.exports = Listing;
