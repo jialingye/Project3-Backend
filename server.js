@@ -29,8 +29,13 @@ app.use(
 
 //router
 const userRouter = require("./controllers/user");
+
 const bookingRouter = require("./controllers/booking");
+
 const reviewRouter = require("./controllers/review");
+
+const listingRouter = require("./controllers/listing")
+
 
 //route
 app.get("/", (req,res)=> {
@@ -38,7 +43,13 @@ app.get("/", (req,res)=> {
 })
 
 app.use("/user", userRouter);
+
 app.use("/booking", bookingRouter);
+
 app.use("/reviews", reviewRouter);
+
+app.use("/listing",listingRouter)
+
+
 //Listener
 app.listen(PORT, () => console.log(`listening to PORT ${PORT}`));
