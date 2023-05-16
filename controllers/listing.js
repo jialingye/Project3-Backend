@@ -22,7 +22,8 @@ router.get("/", async (req, res) => {
     //send error
     res.status(400).json(error);
     }
-  });
+});
+
 
 // Listing SHOW ROUTE
 router.get("/:id", async (req, res) => {
