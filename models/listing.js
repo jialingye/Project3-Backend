@@ -21,46 +21,40 @@ const listingSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    address: {
+        type: String,
+        required: true,
+    },
     location: {
-        country: {
-            type: String,
+        lat: {
+            type: Number,
             required: true,
         },
-        city: {
-            type: String,
-            required: true,
-        },
-        state: {
-            type: String,
-            required: true,
-        },
-        address: {
-            type: String,
+        lng: {
+            type: Number,
             required: true,
         }
     },
-    amenties: {
+    amenities: {
         type: [String],
         required: true,
     },
-    number: {
-        guestNumber: {
+    guestNumber: {
             type: Number,
             required: true,
         },
-        bedroomNumber: {
+    bedroomNumber: {
             type: Number,
             required: true,
         },
-        bedNumber: {
+    bedNumber: {
             type: Number,
             required: true,
         },
-        bathroomNumber:{
+    bathroomNumber:{
             type: Number,
             required: true,
-        }
-    },
+        },
     host: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -95,7 +89,28 @@ listingSchema.methods.calculateRating = function (){
         const totalRating = this.reviews.reduce((sum,review)=> sum + review.rating, 0);
         this.rating = totalRating / this.reviews.length;
     }
-}
+};
+
+// listingSchema.pre('save',async function(next){
+//     try {
+//         const apiKey = '';
+//         const geocodingUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+//             this.address
+//           )}&key=${apiKey}`
+
+//         const response = await fetch(geocodingUrl);
+//         const data = await response.json();
+
+//         const {lat, lng} = data.results[0].geometry.location;
+
+//         this.location.lat = lat;
+//         this.location.lng = lng;
+
+//         next()
+//     } catch (error) {
+//         next(error);
+//     }
+// })
 
 const Listing = mongoose.model('Listing', listingSchema);
 module.exports = Listing;
