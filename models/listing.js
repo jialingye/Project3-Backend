@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+
 const listingSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -91,26 +92,6 @@ listingSchema.methods.calculateRating = function (){
     }
 };
 
-// listingSchema.pre('save',async function(next){
-//     try {
-//         const apiKey = '';
-//         const geocodingUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
-//             this.address
-//           )}&key=${apiKey}`
-
-//         const response = await fetch(geocodingUrl);
-//         const data = await response.json();
-
-//         const {lat, lng} = data.results[0].geometry.location;
-
-//         this.location.lat = lat;
-//         this.location.lng = lng;
-
-//         next()
-//     } catch (error) {
-//         next(error);
-//     }
-// })
 
 const Listing = mongoose.model('Listing', listingSchema);
 module.exports = Listing;
