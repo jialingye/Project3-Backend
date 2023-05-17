@@ -3,6 +3,7 @@
 ////////////////////////////////////////
 const express = require("express");
 const Listing = require("../models/listing");
+const Booking = require("../models/booking");
 require("dotenv").config();
 const {GOOGLE_API_KEY} = process.env;
 ///////////////////////////////
@@ -27,16 +28,24 @@ const router = express.Router();
   });
   //search 
   router.get('/search', async(req,res) =>{
-    const location = req.query.location;
-    const guestNumber = req.query.guestNumber;
-
+    const {location, startDate, endDate, guestNumber} = req.query
+   
     const query = {};
     if(guestNumber){
-      query.guestNumber = guestNumber;
+      query.guestNumber = {$gte: guestNumber};
     }
     if(location){
-      query.location = location;
+      query.address ={$regex: location, $options: "i"};
     }
+    //find the booking 
+    const bookings = await Booking.find({
+      startDate: {$lte: endDate},
+      endDate: {$gte: startDate}
+    })
+
+    const excludeListings = bookings.map((booking)=>booking.listing);
+    query._id = {$nin: excludeListings};
+
     //*****date not finish yet
     //find query object in mongodb
   try{
@@ -119,6 +128,7 @@ router.get("/:id", async (req, res) => {
           lat,
           lng,
         },
+        // host: req.session.currentUser.id,
         ...otherData
       });
 
@@ -147,7 +157,7 @@ router.get("/:id", async (req, res) => {
     try {
       const {default: fetch} = await import('node-fetch');
       const {address, ... otherData} = req.body;
-      const apiKey = 'AIzaSyCp3FsMulLY9P36rd-cwcyWvwA1LEcbi8s';
+      const apiKey = GOOGLE_API_KEY;
       const geocodingUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`
       
       const response = await fetch(geocodingUrl);
