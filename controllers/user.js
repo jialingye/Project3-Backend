@@ -9,13 +9,23 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 let failedLogin;
 
+//user profile page
+router.get('/:id', async(req, res, next) => {
+    try{
+        let userId = req.params.id;
+
+        const user = await User.findById(userId)
+        .populate('listing')
+        .populate('bookings');
+
+        res.json(user)
+    }catch (err){
+        console.log(err);
+    }
+})
+
 
 //login post route
-router.get('/login', (req, res) => {
-    res.send("log in");
-});
-
-
 router.post('/login', async(req, res, next) => {
     try {
         let user;

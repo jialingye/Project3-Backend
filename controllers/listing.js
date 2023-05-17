@@ -18,7 +18,7 @@ const router = express.Router();
   // LISTING INDEX ROUTE
   router.get("/", async (req, res) => {
     try {
-      // send all people
+      // send all listing
       res.json(await Listing.find({}));
     } catch (error) {
       //send error
@@ -90,7 +90,7 @@ router.get("/:id", async (req, res) => {
         const data = await response.json();
         const {lat, lng} = data.results[0].geometry.location;
   
-      // send all people
+      // send all listing
       res.json(
         await Listing.findByIdAndUpdate(
           req.params.id, 
@@ -106,7 +106,7 @@ router.get("/:id", async (req, res) => {
   // LISTING DELETE ROUTE
   router.delete("/:id", async (req, res) => {
     try {
-      // send all people
+      // send all listing
       res.json(await Listing.findByIdAndRemove(req.params.id));
     } catch (error) {
       //send error

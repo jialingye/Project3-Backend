@@ -1,0 +1,75 @@
+////////////////////////////////////////////
+//Dependencies
+////////////////////////////////////////////
+const express = require("express");
+const Booking = require("../models/booking");
+const Listing = require("../models/listing");
+const Review = require("../models/review");
+/////////////////////////////////////////
+// Create Route
+/////////////////////////////////////////
+const router = express.Router();
+
+// ROUTES
+////////////////////////////////
+
+  //REVIEW INDEX ROUTE
+  router.get("/", async (req, res) => {
+    try {
+      // send all listing
+      res.json(await Review.find({}));
+    } catch (error) {
+      //send error
+      res.status(400).json(error);
+    }
+  });
+
+  // GET by id
+router.get("/:id", async (req, res) => {
+  try {
+    res.json(await Review.findById(req.params.id)).status(200);
+  } catch (error) {
+    res.status(400).json(error);
+    console.log("error", error);
+  } finally {
+    console.log("this is finally");
+  }
+});
+  
+  // REVIEW CREATE ROUTE
+  router.post("/", async (req, res) => {
+    try {   
+      const review = await Review.create(req.body);
+    res.json(review);
+    } catch (error) {
+      console.log(error)
+    }
+  });
+
+
+  
+  // REVIEW UPDATE ROUTE
+  router.put("/:id", async (req, res) => {
+    try {
+        // review update
+        res.json(
+          await Review.findByIdAndUpdate(req.params.id, req.body, { new: true })
+        );
+      } catch (error) {
+        //send error
+        res.status(400).json(error);
+      }
+  });
+  
+  // REVIEW DELETE ROUTE
+  router.delete("/:id", async (req, res) => {
+    try {
+      // send all listing
+      res.json(await Review.findByIdAndRemove(req.params.id));
+    } catch (error) {
+      //send error
+      res.status(400).json(error);
+    }
+  });
+
+  module.exports = router;
