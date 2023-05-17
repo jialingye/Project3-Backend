@@ -24,17 +24,6 @@ const router = express.Router();
     }
   });
 
-  // GET by id
-router.get("/:id", async (req, res) => {
-  try {
-    res.json(await Review.findById(req.params.id)).status(200);
-  } catch (error) {
-    res.status(400).json(error);
-    console.log("error", error);
-  } finally {
-    console.log("this is finally");
-  }
-});
   
   // REVIEW CREATE ROUTE
   router.post("/", async (req, res) => {
@@ -43,6 +32,38 @@ router.get("/:id", async (req, res) => {
     res.json(review);
     } catch (error) {
       console.log(error)
+    }
+  });
+
+  //filter 
+router.get('/filter', async(req,res) =>{
+    //defined query variable
+    const overallRating = req.query.overallRating;
+    
+    //make query object
+    const query={};
+    if(overallRating){
+      query.overallRating = overallRating;
+    }
+    //find query object in mongodb
+    try{
+      const result=await Review.find(query);
+      res.json (result);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('server error')
+    }
+  })
+
+    // GET by id
+router.get("/:id", async (req, res) => {
+    try {
+      res.json(await Review.findById(req.params.id)).status(200);
+    } catch (error) {
+      res.status(400).json(error);
+      console.log("error", error);
+    } finally {
+      console.log("this is finally");
     }
   });
 
