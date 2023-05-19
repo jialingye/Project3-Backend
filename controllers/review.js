@@ -32,12 +32,12 @@ const router = express.Router();
     try {   
       const review = await Review.create(req.body);
 
-      const listing = await Listing.findById(req.body.reviewer);
+      const listing = await Listing.findById(req.body.listing);
       listing.reviews.push(review.id)
       await listing.save();
 
       const user = await User.findById(req.body.reviewer);
-      user.reviewGiven.push(review.id)
+      user.reviewsGiven.push(review.id)
       await user.save();
 
       res.json(review);

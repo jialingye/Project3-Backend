@@ -61,9 +61,9 @@ router.get("/:id", async (req, res) => {
           totalPrice,
         });
 
-        const listing = await Listing.findById(req.body.listing);
-        listing.booking.push(booking.id);
-        await listing.save();
+        const listingId = await Listing.findById(req.body.listing);
+        listingId.booking.push(booking.id);
+        await listingId.save();
 
         const user = await User.findById(req.body.guest);
         user.booking.push(booking.id);
