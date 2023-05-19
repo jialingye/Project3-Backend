@@ -123,6 +123,14 @@ router.get("/:id", async (req, res) => {
       const response = await fetch(geocodingUrl);
         const data = await response.json();
         const {lat, lng} = data.results[0].geometry.location;
+
+        const city = data.results[0].address_components.find(
+          (component) => component.types.includes('locality')
+        ).long_name;
+        // console.log(city)
+        const country = data.results[0].address_components.find(
+          (component) => component.types.includes('country')
+        ).long_name;
     
         console.log(req.body)
       const listing = await Listing.create({
@@ -140,7 +148,7 @@ router.get("/:id", async (req, res) => {
 
       
 
-    res.json(listing);
+    res.json({listing,city,country});
     } catch (error) {
       if (error.name === 'ValidationError') {
     const validationErrors = Object.values(error.errors).map((err) => err.message);
@@ -166,14 +174,21 @@ router.get("/:id", async (req, res) => {
       const response = await fetch(geocodingUrl);
         const data = await response.json();
         const {lat, lng} = data.results[0].geometry.location;
-  
-      // send all listing
-      res.json(
-        await Listing.findByIdAndUpdate(
+      
+        const city = data.results[0].address_components.find(
+          (component) => component.types.includes('locality')
+        ).long_name;
+        console.log(city)
+        const country = data.results[0].address_components.find(
+          (component) => component.types.includes('country')
+        ).long_name;
+        console.log(country)
+        const updatedListing = await Listing.findByIdAndUpdate(
           req.params.id, 
           {address, location:{lat, lng}, ... otherData}, 
           { new: true })
-      );
+      // send all listing
+      res.json( updatedListing, city, country );
     } catch (error) {
       //send error
       res.status(400).json(error);
