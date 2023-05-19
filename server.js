@@ -8,6 +8,7 @@ const morgan = require("morgan");
 const mongoose = require("./models/connection");
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+const Listing = require('./models/listing');
 
 // middleWare
 app.use(cors());
@@ -30,14 +31,24 @@ app.use(
 //router
 const userRouter = require("./controllers/user");
 const bookingRouter = require("./controllers/booking");
+const listingRouter = require("./controllers/listing");
+const reviewRouter = require("./controllers/review")
 
 //route
-app.get("/", (req,res)=> {
-    res.send("hello world");
+app.get("/", async(req,res)=> {
+    try {
+        // send all listing
+        res.json(await Listing.find({}));
+      } catch (error) {
+        //send error
+        res.status(400).json(error);
+      }
 })
 
 app.use("/user", userRouter);
 app.use("/booking", bookingRouter);
+app.use("/listing", listingRouter);
+app.use("/review", reviewRouter);
 
 //Listener
 app.listen(PORT, () => console.log(`listening to PORT ${PORT}`));

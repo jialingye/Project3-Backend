@@ -3,6 +3,8 @@
 ////////////////////////////////////////
 const express = require("express");
 const Booking = require("../models/booking");
+const Listing = require("../models/listing");
+const User = require("../models/user");
 ///////////////////////////////
 
 /////////////////////////////////////////
@@ -16,7 +18,7 @@ const router = express.Router();
   // BOOKING INDEX ROUTE
   router.get("/", async (req, res) => {
     try {
-      // send all people
+      // send all booking
       res.json(await Booking.find({}));
     } catch (error) {
       //send error
@@ -39,8 +41,38 @@ router.get("/:id", async (req, res) => {
   // BOOKING CREATE ROUTE
   router.post("/", async (req, res) => {
     try {
-      // send all people
-      res.json(await Booking.create(req.body));
+        // get from body
+        const {guest, listing, startDate, endDate} = req.body;
+        //get the listing price
+        const listingOb = await Listing.findById(listing).select('price');
+        const {price} = listingOb; 
+        //calculate the days of stay
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const days = Math.ceil((end - start)/(1000*60*60*24));
+        //calculate the price
+        const totalPrice = days * price + price * days * 0.1
+      try{
+        const booking = await Booking.create({
+          guest,
+          listing,
+          startDate,
+          endDate,
+          totalPrice,
+        });
+
+        const listingId = await Listing.findById(req.body.listing);
+        listingId.bookings.push(booking.id);
+        await listingId.save();
+
+        const user = await User.findById(req.body.guest);
+        user.bookings.push(booking.id);
+        await user.save();
+
+        res.json(booking);  
+      } catch (error){
+        console.log(error)
+      }     
     } catch (error) {
       //send error
       res.status(400).json(error);
@@ -50,9 +82,19 @@ router.get("/:id", async (req, res) => {
   // BOOKING UPDATE ROUTE
   router.put("/:id", async (req, res) => {
     try {
+      const {guest, listing, startDate, endDate} = req.body;
+      //get the listing price
+      const listingOb = await Listing.findById(listing).select('price');
+      const {price} = listingOb; 
+      //calculate the days of stay
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const days = Math.ceil((end - start)/(1000*60*60*24));
+      //calculate the price
+      const totalPrice = days * price + price * days * 0.1
       // send all people
       res.json(
-        await Booking.findByIdAndUpdate(req.params.id, req.body, { new: true })
+        await Booking.findByIdAndUpdate(req.params.id, {guest,listing, startDate, endDate, totalPrice}, { new: true })
       );
     } catch (error) {
       //send error
