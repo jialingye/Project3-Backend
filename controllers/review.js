@@ -5,6 +5,8 @@ const express = require("express");
 const Booking = require("../models/booking");
 const Listing = require("../models/listing");
 const Review = require("../models/review");
+const User = require("../models/user");
+
 /////////////////////////////////////////
 // Create Route
 /////////////////////////////////////////
@@ -29,7 +31,16 @@ const router = express.Router();
   router.post("/", async (req, res) => {
     try {   
       const review = await Review.create(req.body);
-    res.json(review);
+
+      const listing = await Listing.findById(req.body.reviewer);
+      listing.reviews.push(review.id)
+      await listing.save();
+
+      const user = await User.findById(req.body.reviewer);
+      user.reviewGiven.push(review.id)
+      await user.save();
+
+      res.json(review);
     } catch (error) {
       console.log(error)
     }

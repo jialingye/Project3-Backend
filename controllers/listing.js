@@ -4,6 +4,8 @@
 const express = require("express");
 const Listing = require("../models/listing");
 const Booking = require("../models/booking");
+const axios = require("axios");
+const User = require("../models/user");
 require("dotenv").config();
 const {GOOGLE_API_KEY} = process.env;
 ///////////////////////////////
@@ -122,6 +124,7 @@ router.get("/:id", async (req, res) => {
         const data = await response.json();
         const {lat, lng} = data.results[0].geometry.location;
     
+        console.log(req.body)
       const listing = await Listing.create({
         address,
         location: {
@@ -131,14 +134,13 @@ router.get("/:id", async (req, res) => {
         // host: req.session.currentUser.id,
         ...otherData
       });
+      const user = await User.findById(req.body.host);
+      user.listing.push(listing.id)
+      await user.save();
 
-    // console.log(listing)
-     //*****ask david how to use postman to test without hard code the user id
-    // const populatedListing = await listing.populate('host').execPopulate();
-    // console.log(populatedListing)
-    // res.json(populatedListing);
+      
+
     res.json(listing);
-
     } catch (error) {
       if (error.name === 'ValidationError') {
     const validationErrors = Object.values(error.errors).map((err) => err.message);
@@ -149,6 +151,7 @@ router.get("/:id", async (req, res) => {
     return res.status(500).json({ error: 'Internal server error' });
       }
   });
+
 
 
   

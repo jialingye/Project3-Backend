@@ -18,7 +18,7 @@ const listingSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
-    size: {
+    share: {
         type: String,
         required: true,
     },
@@ -74,10 +74,6 @@ const listingSchema = new mongoose.Schema({
         ref: 'Booking',
     }],
     createdAt: {
-        type: Date,
-        default: Date.now,
-    },
-    updatedAt: {
         type: Date,
         default: Date.now,
     }

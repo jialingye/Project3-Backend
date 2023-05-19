@@ -49,7 +49,7 @@ router.post('/login', async(req, res, next) => {
                 username: user.username
             };
             
-            res.redirect('/');
+           res.json(req.session.currentUser)
         } else {
             failedLogin = "Your username or password didn't match"
             res.redirect('/login');

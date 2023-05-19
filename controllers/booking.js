@@ -3,7 +3,8 @@
 ////////////////////////////////////////
 const express = require("express");
 const Booking = require("../models/booking");
-const Listing = require("../models/listing")
+const Listing = require("../models/listing");
+const User = require("../models/user");
 ///////////////////////////////
 
 /////////////////////////////////////////
@@ -50,7 +51,7 @@ router.get("/:id", async (req, res) => {
         const end = new Date(endDate);
         const days = Math.ceil((end - start)/(1000*60*60*24));
         //calculate the price
-        const totalPrice = days * price + price * 0.1
+        const totalPrice = days * price + price * days * 0.1
       try{
         const booking = await Booking.create({
           guest,
@@ -59,6 +60,15 @@ router.get("/:id", async (req, res) => {
           endDate,
           totalPrice,
         });
+
+        const listing = await Listing.findById(req.body.listing);
+        listing.booking.push(booking.id);
+        await listing.save();
+
+        const user = await User.findById(req.body.guest);
+        user.booking.push(booking.id);
+        await user.save();
+
         res.json(booking);  
       } catch (error){
         console.log(error)
@@ -81,7 +91,7 @@ router.get("/:id", async (req, res) => {
       const end = new Date(endDate);
       const days = Math.ceil((end - start)/(1000*60*60*24));
       //calculate the price
-      const totalPrice = days * price + price * 0.1
+      const totalPrice = days * price + price * days * 0.1
       // send all people
       res.json(
         await Booking.findByIdAndUpdate(req.params.id, {guest,listing, startDate, endDate, totalPrice}, { new: true })

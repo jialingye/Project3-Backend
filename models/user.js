@@ -34,10 +34,6 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Listing',
     }],
-    reviewsReceived: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Review',
-    }],
     reviewsGiven:[{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Review',
