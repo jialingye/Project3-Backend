@@ -126,7 +126,15 @@ router.get('/filter', async(req,res) =>{
         console.log(locationResponse.data.results[0])
         console.log(coordinates);
         console.log("----blablabal------")
-        
+
+        const city = locationResponse.data.results[0].address_components.find(
+          (component) => component.types.includes('locality')
+        ).long_name;
+        // console.log(city)
+        const country = locationResponse.data.results[0].address_components.find(
+          (component) => component.types.includes('country')
+        ).long_name;
+        // console.log(country)
         // Create the property in your database with the retrieved latitude and longitude
         const newProperty = await Listing.create({
             title: req.body.title,
@@ -152,7 +160,7 @@ router.get('/filter', async(req,res) =>{
         await user.save();
     
         // Return the newly created property in the response
-        res.status(200).json(newProperty);
+        res.status(200).json({property: newProperty, city, country});
     } catch (error) {
         console.log(error)
         res.status(400).json(error);
@@ -172,6 +180,15 @@ router.get('/filter', async(req,res) =>{
 
         const coordinates = locationResponse.data.results[0].geometry.location;
 
+        const city = locationResponse.data.results[0].address_components.find(
+          (component) => component.types.includes('locality')
+        ).long_name;
+        //console.log(city)
+        const country = locationResponse.data.results[0].address_components.find(
+          (component) => component.types.includes('country')
+        ).long_name;
+        //console.log(country)
+
         const updateListing = {
             ...req.body,
             location: {
@@ -182,7 +199,7 @@ router.get('/filter', async(req,res) =>{
 
         const updatedListing = await Listing.findByIdAndUpdate(req.params.id, updateListing, { new: true })
 
-        res.status(200).json(updatedListing);
+        res.status(200).json({updatedListing,city,country});
     } catch (error) {
         console.log(error)
         res.status(400).json(error);
