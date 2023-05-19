@@ -4,25 +4,11 @@ const mongoose = require('mongoose');
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 require("dotenv").config();
-const {SALT} = process.env;
+const {SALT,SECRET} = process.env;
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+const jwt = require('jsonwebtoken');
 let failedLogin;
-
-//user profile page
-router.get('/:id', async(req, res, next) => {
-    try{
-        let userId = req.params.id;
-
-        const user = await User.findById(userId)
-        .populate('listing')
-        .populate('bookings');
-
-        res.json(user)
-    }catch (err){
-        console.log(err);
-    }
-})
 
 
 //login post route
@@ -38,21 +24,28 @@ router.post('/login', async(req, res, next) => {
             user = await User.findOne({email: req.body.email});
         } else {
             failedLogin = "Your username or password didn't match"
-            return res.redirect('/user/login');
+            return res.status(401).json({error: failedLogin });
         }
         //if user match, compare password
         const match = await bcrypt.compare(req.body.password, user.password);
         //if password match, then create session
         if(match) {
+            const token = jwt.sign(
+                {
+                    id: user._id,
+                    username: user.username,
+                },
+                SECRET
+            );
             req.session.currentUser = {
                 id: user._id,
                 username: user.username
             };
             
-           res.json(req.session.currentUser)
+           res.json({token, currentUser: req.session.currentUser})
         } else {
             failedLogin = "Your username or password didn't match"
-            res.redirect('/login');
+            res.status(401).json({ error: failedLogin });
         }
     } catch(err) {
         console.log(err);
@@ -74,7 +67,7 @@ router.post('/signup', async(req, res, next) => {
             email: req.body.email,
             password: req.body.password
           };
-        //creat hash on user password depends on SALT number
+        //create hash on user password depends on SALT number
         const rounds = SALT;
         const salt = await bcrypt.genSalt(parseInt(rounds));
         const hash = await bcrypt.hash(newUser.password, salt);
@@ -87,7 +80,7 @@ router.post('/signup', async(req, res, next) => {
              res.status(400).json({error: 'Email already exists'})
         } else {
             await User.create(newUser);
-            res.redirect('/user/login');
+            res.status(200).json({ message: 'User created successfully' });
         }
     } catch(err) {
         console.log(err);
@@ -98,8 +91,30 @@ router.post('/signup', async(req, res, next) => {
 
 //logout page
 router.get('/logout', (req, res) => {
-    req.session.destroy();
-    res.redirect('/');
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Error destroying session:', err);
+        res.status(500).json({ error: 'Server error' });
+      } else {
+        res.clearCookie('token'); // Clear the token cookie
+        res.json({ message: 'Logout successful' });
+      }
+    });
+  });
+
+//user and host profile page
+router.get('/:id', async(req, res, next) => {
+    try{
+        let userId = req.params.id;
+
+        const user = await User.findById(userId)
+        .populate('listing')
+        .populate('bookings');
+
+        res.json(user)
+    }catch (err){
+        console.log(err);
+    }
 })
 
 module.exports = router;
