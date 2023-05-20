@@ -87,7 +87,19 @@ router.post('/signup', async(req, res, next) => {
         next();
     }
 })
-
+// //logout page
+router.get('/validation', (req, res) => {
+   try {
+    // get token from header
+    const token = req.headers.authorization.split(' ')[1];
+    // verify token
+    const decoded = jwt.verify(token, SECRET);
+    //send response back to front end
+    res.json({valid: true, user: decoded});
+    } catch (error) {
+    res.json({valid: false});
+    }
+  });
 
 //logout page
 router.get('/logout', (req, res) => {
