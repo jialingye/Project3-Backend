@@ -117,4 +117,17 @@ router.get('/:id', async(req, res, next) => {
     }
 })
 
+//update user
+  router.put("/:id", async (req, res) => {
+    try {
+        // review update
+        res.json(
+          await User.findByIdAndUpdate(req.params.id, req.body, { new: true })
+        );
+      } catch (error) {
+        //send error
+        res.status(400).json(error);
+      }
+  });
+
 module.exports = router;

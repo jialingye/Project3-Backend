@@ -18,6 +18,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    description: {
+        type: String,
+        default: ""
+    },
+    occupation: {
+        type: String,
+        default: ""
+    },
     isHost: {
         type: Boolean,
         default: false,
