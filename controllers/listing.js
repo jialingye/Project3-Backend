@@ -135,6 +135,8 @@ router.get("/:id", async (req, res) => {
         console.log(req.body)
       const listing = await Listing.create({
         address,
+        city,
+        country,
         location: {
           lat,
           lng,
@@ -148,7 +150,7 @@ router.get("/:id", async (req, res) => {
 
       
 
-    res.json({listing,city,country});
+    res.json({listing});
     } catch (error) {
       if (error.name === 'ValidationError') {
     const validationErrors = Object.values(error.errors).map((err) => err.message);
@@ -185,10 +187,10 @@ router.get("/:id", async (req, res) => {
         console.log(country)
         const updatedListing = await Listing.findByIdAndUpdate(
           req.params.id, 
-          {address, location:{lat, lng}, ... otherData}, 
+          {address, city: city, country: country,location:{lat, lng}, ... otherData}, 
           { new: true })
       // send all listing
-      res.json( updatedListing, city, country );
+      res.json( updatedListing);
     } catch (error) {
       //send error
       res.status(400).json(error);

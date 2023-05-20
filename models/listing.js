@@ -26,6 +26,14 @@ const listingSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    city: {
+        type: String,
+        default: "",
+    },
+    country: {
+        type: String,
+        default: "",
+    },
     location: {
         lat: {
             type: Number,
