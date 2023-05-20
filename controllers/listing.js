@@ -143,6 +143,8 @@ router.get('/filter', async(req,res) =>{
             price: req.body.price,
             share: req.body.share,
             address: req.body.address,
+            city: city,
+            country: country,
             location: {
                 lat: coordinates.lat,
                 lng: coordinates.lng,
@@ -160,7 +162,7 @@ router.get('/filter', async(req,res) =>{
         await user.save();
     
         // Return the newly created property in the response
-        res.status(200).json({property: newProperty, city, country});
+        res.status(200).json({property: newProperty});
     } catch (error) {
         console.log(error)
         res.status(400).json(error);
@@ -191,6 +193,8 @@ router.get('/filter', async(req,res) =>{
 
         const updateListing = {
             ...req.body,
+            city: city,
+            country: country,
             location: {
               lat: coordinates.lat,
               lng: coordinates.lng,
@@ -199,7 +203,7 @@ router.get('/filter', async(req,res) =>{
 
         const updatedListing = await Listing.findByIdAndUpdate(req.params.id, updateListing, { new: true })
 
-        res.status(200).json({updatedListing,city,country});
+        res.status(200).json(updatedListing);
     } catch (error) {
         console.log(error)
         res.status(400).json(error);
