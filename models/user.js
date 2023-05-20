@@ -22,6 +22,14 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    description: {
+        type: String,
+        default: ""
+    },
+    occupation: {
+        type: String,
+        default: ""
+    },
     listing: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Listing',

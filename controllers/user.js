@@ -129,4 +129,16 @@ router.get('/:id', async(req, res, next) => {
     }
 })
 
+//user and host profile page
+router.put('/:id', async(req, res, next) => {
+    try{
+         // user update
+         res.json(
+            await User.findByIdAndUpdate(req.params.id, req.body, { new: true })
+          );
+    }catch (err){
+        console.log(err);
+    }
+})
+
 module.exports = router;
