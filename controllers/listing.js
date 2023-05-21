@@ -105,8 +105,10 @@ router.get('/filter', async(req,res) =>{
   // GET by id
   router.get("/:id", async (req, res) => {
     try {
-        const property = await Listing.findById(req.params.id);
-
+        const property = await Listing.findById(req.params.id)
+          .populate('host')
+          .populate('bookings')
+          .populate('reviews')
         res.status(200).json({property});
       } catch (error) {
         res.status(400).json(error);
