@@ -43,9 +43,10 @@ router.get("/:id", async (req, res) => {
     try {
         // get from body
         const {guest, listing, startDate, endDate} = req.body;
-        //get the listing price
-        const listingOb = await Listing.findById(listing).select('price');
-        const {price} = listingOb; 
+        //get the listing price,address,images
+        const listingOb = await Listing.findById(listing);
+        const {price,address,images,city} = listingOb; 
+        const image = images[0];
         //calculate the days of stay
         const start = new Date(startDate);
         const end = new Date(endDate);
@@ -56,17 +57,20 @@ router.get("/:id", async (req, res) => {
         const booking = await Booking.create({
           guest,
           listing,
+          address,
+          city,
+          image,
           startDate,
           endDate,
           totalPrice,
-        });
-
+        })
+    
         const listingId = await Listing.findById(req.body.listing);
-        listingId.booking.push(booking.id);
+        listingId.bookings.push(booking.id);
         await listingId.save();
 
         const user = await User.findById(req.body.guest);
-        user.booking.push(booking.id);
+        user.bookings.push(booking.id);
         await user.save();
 
         res.json(booking);  
@@ -84,8 +88,9 @@ router.get("/:id", async (req, res) => {
     try {
       const {guest, listing, startDate, endDate} = req.body;
       //get the listing price
-      const listingOb = await Listing.findById(listing).select('price');
-      const {price} = listingOb; 
+      const listingOb = await Listing.findById(listing);
+      const {price,address,images,city} = listingOb; 
+      const image = images[0];
       //calculate the days of stay
       const start = new Date(startDate);
       const end = new Date(endDate);
@@ -94,7 +99,7 @@ router.get("/:id", async (req, res) => {
       const totalPrice = days * price + price * days * 0.1
       // send all people
       res.json(
-        await Booking.findByIdAndUpdate(req.params.id, {guest,listing, startDate, endDate, totalPrice}, { new: true })
+        await Booking.findByIdAndUpdate(req.params.id, {guest,listing, startDate, endDate, address, city, image, totalPrice}, { new: true })
       );
     } catch (error) {
       //send error

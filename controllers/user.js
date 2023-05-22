@@ -121,7 +121,8 @@ router.get('/:id', async(req, res, next) => {
 
         const user = await User.findById(userId)
         .populate('listing')
-        .populate('bookings');
+        .populate('bookings')
+        .populate('review');
 
         res.json(user)
     }catch (err){
