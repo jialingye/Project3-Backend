@@ -31,6 +31,18 @@ const bookingSchema = new mongoose.Schema({
             message: 'End date must be after the start date',
         }
     },
+    address:{
+        type: String,
+        default:"",
+    },
+    image: {
+        type: String,
+        default:"",
+    },
+    city:{
+        type: String,
+        default: "",
+    },
     totalPrice: {
         type: Number,
         default: 0,
