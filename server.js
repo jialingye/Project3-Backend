@@ -31,14 +31,24 @@ app.use(
 const userRouter = require("./controllers/user");
 const bookingRouter = require("./controllers/booking");
 const reviewRouter = require("./controllers/review");
+const listingRouter = require("./controllers/listing");
 
-//route
-app.get("/", (req,res)=> {
-    res.send("hello world");
-})
 
+
+app.use("/listing", listingRouter);
 app.use("/user", userRouter);
 app.use("/booking", bookingRouter);
 app.use("/reviews", reviewRouter);
+
+//route
+
+app.get("/", (req,res) => {
+    res.send("hello world");
+})
+
+// app.get('/listing', (req,res) => {
+//     res.send('listing');
+// })
+
 //Listener
 app.listen(PORT, () => console.log(`listening to PORT ${PORT}`));

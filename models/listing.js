@@ -3,62 +3,62 @@ const mongoose = require('mongoose');
 const listingSchema = new mongoose.Schema({
     title: {
         type: String,
-        required: true,
+        required: false,
     },
     images: {
         type: [String],
-        required: true,
+        required: false,
     },
     types: {
         type: String,
-        required: true,
+        required: false,
     },
     price: {
         type: Number,
-        required: true,
+        required: false,
     },
     size: {
         type: String,
-        required: true,
+        required: false,
     },
     location: {
         country: {
             type: String,
-            required: true,
+            required: false,
         },
         city: {
             type: String,
-            required: true,
+            required: false,
         },
         state: {
             type: String,
-            required: true,
+            required: false,
         },
         address: {
             type: String,
-            required: true,
+            required: false,
         }
     },
     amenties: {
         type: [String],
-        required: true,
+        required: false,
     },
     number: {
         guestNumber: {
             type: Number,
-            required: true,
+            required: false,
         },
         bedroomNumber: {
             type: Number,
-            required: true,
+            required: false,
         },
         bedNumber: {
             type: Number,
-            required: true,
+            required: false,
         },
         bathroomNumber:{
             type: Number,
-            required: true,
+            required: false,
         }
     },
     host: {
@@ -97,5 +97,5 @@ listingSchema.methods.calculateRating = function (){
     }
 }
 
-const Listing = mongoose.model('Listing', userSchema);
+const Listing = mongoose.model('Listing', listingSchema);
 module.exports = Listing;
