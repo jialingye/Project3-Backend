@@ -45,7 +45,7 @@ router.get("/:id", async (req, res) => {
         const {guest, listing, startDate, endDate} = req.body;
         //get the listing price,address,images
         const listingOb = await Listing.findById(listing);
-        const {price,address,images,city} = listingOb; 
+        const {price,address,images,city,host} = listingOb; 
         const image = images[0];
         //calculate the days of stay
         const start = new Date(startDate);
@@ -58,6 +58,7 @@ router.get("/:id", async (req, res) => {
           guest,
           listing,
           address,
+          host,
           city,
           image,
           startDate,
@@ -89,7 +90,7 @@ router.get("/:id", async (req, res) => {
       const {guest, listing, startDate, endDate} = req.body;
       //get the listing price
       const listingOb = await Listing.findById(listing);
-      const {price,address,images,city} = listingOb; 
+      const {price,address,images,city, host} = listingOb; 
       const image = images[0];
       //calculate the days of stay
       const start = new Date(startDate);
@@ -99,7 +100,7 @@ router.get("/:id", async (req, res) => {
       const totalPrice = days * price + price * days * 0.1
       // send all people
       res.json(
-        await Booking.findByIdAndUpdate(req.params.id, {guest,listing, startDate, endDate, address, city, image, totalPrice}, { new: true })
+        await Booking.findByIdAndUpdate(req.params.id, {guest,listing,host,startDate, endDate, address, city, image, totalPrice}, { new: true })
       );
     } catch (error) {
       //send error

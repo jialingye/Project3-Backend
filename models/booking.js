@@ -11,6 +11,10 @@ const bookingSchema = new mongoose.Schema({
         ref: 'Listing',
         index: true,
     },
+    host: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
     startDate: {
         type: Date,
         required: true,
