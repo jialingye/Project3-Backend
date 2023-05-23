@@ -26,6 +26,21 @@ const router = express.Router();
     }
   });
 
+  // Get Booking by HostId
+  router.get("/host/:id", async (req, res) => {
+    try {
+      const hostId = req.params.id;
+
+      const bookings = await Booking.find({host: hostId})
+      // send all booking
+      res.json(bookings);
+    } catch (error) {
+      //send error
+      res.status(400).json(error);
+    }
+  });
+
+
   // GET by id
 router.get("/:id", async (req, res) => {
   try {
@@ -91,6 +106,7 @@ router.get("/:id", async (req, res) => {
       //get the listing price
       const listingOb = await Listing.findById(listing);
       const {price,address,images,city, host} = listingOb; 
+      console.log(city)
       const image = images[0];
       //calculate the days of stay
       const start = new Date(startDate);
