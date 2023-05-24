@@ -91,8 +91,15 @@ listingSchema.methods.calculateRating = function (){
     if(this.reviews.length === 0){
         this.rating = 0;
     } else {
-        const totalRating = this.reviews.reduce((sum,review)=> sum + review.rating, 0);
+        let totalRating = 0;
+       
+        for(i=0; i<this.reviews.length; i++){
+            
+            totalRating += this.reviews[i].overallRating
+        }
+       
         this.rating = totalRating / this.reviews.length;
+        
     }
 };
 
