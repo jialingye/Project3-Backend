@@ -121,9 +121,6 @@ router.get('/:id', async(req, res, next) => {
 //update user
   router.put("/:id", async (req, res) => {
     try {
-        //console.log("hoa",req.body.isHost)
-       //req.body.isHost= req.body.isHost==="checked" ? true:false;
-        // review update
         res.json(
           await User.findByIdAndUpdate(req.params.id,req.body, { new: true })
         );

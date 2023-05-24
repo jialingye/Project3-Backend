@@ -26,10 +26,6 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
-    isHost: {
-        type: Boolean,
-        default: false,
-    },
     listing: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Listing',
