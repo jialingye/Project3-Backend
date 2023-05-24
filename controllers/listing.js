@@ -162,7 +162,7 @@ router.get('/filter', async(req,res) =>{
         const user = await User.findById(req.body.host);
         user.listing.push(newProperty.id);
         await user.save();
-    
+
         // Return the newly created property in the response
         res.status(200).json({property: newProperty});
     } catch (error) {

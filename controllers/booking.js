@@ -58,6 +58,19 @@ router.get("/:id", async (req, res) => {
     try {
         // get from body
         const {guest, listing, startDate, endDate} = req.body;
+
+        // check for booking overlap
+        const overlappingBookings = await Booking.find({
+          listing: listing,
+          endDate: { $gt: new Date(startDate) },
+          startDate: { $lt: new Date(endDate) }
+        });
+    
+        if (overlappingBookings.length > 0) {
+          // Return an error response indicating the overlap
+          return res.status(400).json({ error: "Overlapping booking detected" });
+        }
+
         //get the listing price,address,images
         const listingOb = await Listing.findById(listing);
         const {price,address,images,city,host} = listingOb; 
@@ -103,6 +116,19 @@ router.get("/:id", async (req, res) => {
   router.put("/:id", async (req, res) => {
     try {
       const {guest, listing, startDate, endDate} = req.body;
+
+      //check the booking overlap
+      const overlappingBookings = await Booking.find({
+        listing: listing,
+        endDate: { $gt: new Date(startDate) },
+        startDate: { $lt: new Date(endDate) }
+      });
+  
+      if (overlappingBookings.length > 0) {
+        // Return an error response indicating the overlap
+        return res.status(400).json({ error: "Overlapping booking detected" });
+      }
+      
       //get the listing price
       const listingOb = await Listing.findById(listing);
       const {price,address,images,city, host} = listingOb; 

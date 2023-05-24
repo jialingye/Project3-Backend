@@ -36,6 +36,9 @@ const router = express.Router();
       listing.reviews.push(review.id)
       await listing.save();
 
+      // listing.calculateRating();
+      //   await listing.save();
+
       const user = await User.findById(req.body.reviewer);
       user.reviewsGiven.push(review.id)
       await user.save();
