@@ -18,18 +18,48 @@ const router = express.Router();
 // ROUTES
 ////////////////////////////////
 
-  // LISTING INDEX ROUTE
-  router.get("/", async (req, res) => {
-    let properties;
-    try {
-    // get all properties
-        properties = await Listing.find({})
-        res.status(200).json(properties)
-    } catch (error) {
+// LISTING INDEX ROUTE
+router.get("/", async (req, res) => {
+  // Filter
+  console.log(req.query)
+  const price = req.query.price
+  const roomNumber = req.query.roomNumber;
+  const bedNumber = req.query.bedNumber ;
+  const bathroomNumber = req.query.bathroomNumber;
+  if (price) {
+    const listingsPrice = await Listing.find({price:{$lte:price,$gte:0}})
+    console.log(listingsPrice)
+    return res.status(200).json(listingsPrice)
+  }
+  if (roomNumber) {
+    const listingsRoomNumber = await Listing.find({roomNumber:{$lte:roomNumber,$gte:0}})
+    console.log(listingsRoomNumber)
+    return res.status(200).json(listingsRoomNumber)
+  }
+  if (bedNumber) {
+    const listingsBedNumber = await Listing.find({bedNumber:{$lte:bedNumber,$gte:0}})
+    console.log(listingsBedNumber)
+    return res.status(200).json(listingsBedNumber)
+  }
+  if (bathroomNumber) {
+    const listingsbathroomNumber = await Listing.find({bathroomNumber:{$lte:bathroomNumber,$gte:0}})
+    console.log(listingsbathroomNumber)
+    return res.status(200).json(listingsbathroomNumber)
+  }
+
+
+
+  // Get all properties
+  let properties;
+  try {
+    properties = await Listing.find({})
+    res.status(200).json(properties)
+  } catch (error) {
     //send error
-        res.status(400).json(error);
-    }
+    res.status(400).json(error);
+  }
 });
+
   //search 
   router.get('/search', async(req,res) =>{
     const {location, startDate, endDate, guestNumber} = req.query
@@ -60,47 +90,6 @@ const router = express.Router();
     res.status(500).send('server error')
   }
   })
-
-  //filter 
-router.get('/filter', async(req,res) =>{
-  //defined query variable
-  const roomNumber = req.query.roomNumber;
-  const bedNumber = req.query.bedNumber ;
-  const bathroomNumber = req.query.bathroomNumber;
-  const propType = req.query.propType;
-  const amenities = req.query.amenities;
-  const maxPrice= req.query.maxPrice;
-  
-  //make query object
-  const query={};
-  if(roomNumber){
-    query.roomNumber = roomNumber;
-  }
-  if (bedNumber){
-    query.bedNumber = bedNumber;
-  }
-  if(bathroomNumber){
-    query.bathroomNumber = bathroomNumber;
-  }
-  if(propType){
-    query.propType = propType;
-  }
-  if (amenities){
-    query.amenities = {$all: amenities};
-  }
-  if(maxPrice){
-    query.maxPrice = {$lte: maxPrice};
-  }
-
-  //find query object in mongodb
-  try{
-    const result=await Listing.find(query);
-    res.json (result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('server error')
-  }
-})
   
   // GET by id
   router.get("/:id", async (req, res) => {
