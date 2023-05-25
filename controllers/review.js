@@ -30,7 +30,11 @@ const router = express.Router();
   // REVIEW CREATE ROUTE
   router.post("/", async (req, res) => {
     try {   
-      const review = await Review.create(req.body);
+       //get the reviewer username and image
+       const userOb = await User.findById(req.body.reviewer);
+       const {username,image} = userOb; 
+
+      const review = await Review.create({...req.body, username, image});
 
       const listing = await Listing.findById(req.body.listing)
       listing.reviews.push(review.id)
@@ -91,8 +95,15 @@ router.get("/:id", async (req, res) => {
         res.json(
           await Review.findByIdAndUpdate(req.params.id, req.body, { new: true })
         );
+        // change listing rating
+        const listing = await Listing.findById(req.body.listing)
+        const populatedListing = await listing.populate('reviews')
+        await populatedListing.calculateRating();
+        await populatedListing.save();
+        console.log('you are here')
       } catch (error) {
         //send error
+        console.log(error)
         res.status(400).json(error);
       }
   });

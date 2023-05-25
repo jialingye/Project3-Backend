@@ -124,10 +124,10 @@ router.get('/filter', async(req,res) =>{
         )}&key=${GOOGLE_API_KEY}`)
 
         const coordinates = locationResponse.data.results[0].geometry.location;
-        console.log("----blablabal------")
-        console.log(locationResponse.data.results[0])
-        console.log(coordinates);
-        console.log("----blablabal------")
+        // console.log("----blablabal------")
+        // console.log(locationResponse.data.results[0])
+        // console.log(coordinates);
+        // console.log("----blablabal------")
 
         const city = locationResponse.data.results[0].address_components.find(
           (component) => component.types.includes('locality')

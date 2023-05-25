@@ -6,6 +6,15 @@ const reviewSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
+    username: {
+        type: String,
+        default: 'anonymous user'
+    },
+
+    image: {
+        type: String,
+        default: 'https://logos-world.net/wp-content/uploads/2020/07/Airbnb-Logo.png'
+    },
     listing: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Listing',
