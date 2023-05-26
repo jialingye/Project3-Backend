@@ -21,9 +21,9 @@ const router = express.Router();
 // LISTING INDEX ROUTE
 router.get("/", async (req, res) => {
   // Filter
-  console.log(req.query)
+  console.log("req.query-------------------------------",req.query)
   const price = req.query.price
-  const roomNumber = req.query.roomNumber;
+  const bedroomNumber = req.query.bedroomNumber;
   const bedNumber = req.query.bedNumber ;
   const bathroomNumber = req.query.bathroomNumber;
   if (price) {
@@ -31,23 +31,21 @@ router.get("/", async (req, res) => {
     console.log(listingsPrice)
     return res.status(200).json(listingsPrice)
   }
-  if (roomNumber) {
-    const listingsRoomNumber = await Listing.find({roomNumber:{$lte:roomNumber,$gte:0}})
+  if (bedroomNumber) {
+    const listingsRoomNumber = await Listing.find({bedroomNumber:{$gte:bedroomNumber}})
     console.log(listingsRoomNumber)
     return res.status(200).json(listingsRoomNumber)
   }
   if (bedNumber) {
-    const listingsBedNumber = await Listing.find({bedNumber:{$lte:bedNumber,$gte:0}})
+    const listingsBedNumber = await Listing.find({bedNumber:{$gte:bedNumber}})
     console.log(listingsBedNumber)
     return res.status(200).json(listingsBedNumber)
   }
   if (bathroomNumber) {
-    const listingsbathroomNumber = await Listing.find({bathroomNumber:{$lte:bathroomNumber,$gte:0}})
+    const listingsbathroomNumber = await Listing.find({bathroomNumber:{$gte:bathroomNumber}})
     console.log(listingsbathroomNumber)
     return res.status(200).json(listingsbathroomNumber)
   }
-
-
 
   // Get all properties
   let properties;
