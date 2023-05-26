@@ -104,6 +104,46 @@ router.get("/", async (req, res) => {
       }
 });
 
+//filter 	
+router.get('/filter',async(req,res)=>{
+  //defined query variable
+  constroomNumber=req.query.roomNumber;
+  constbedNumber=req.query.bedNumber;
+  constbathroomNumber=req.query.bathroomNumber;
+  constpropType=req.query.propType;
+  constamenities=req.query.amenities;
+  constmaxPrice=req.query.maxPrice;
+  //make query object
+  constquery={};
+  if(roomNumber){
+  query.roomNumber=roomNumber;
+  }
+  if(bedNumber){
+  query.bedNumber=bedNumber;
+  }
+  if(bathroomNumber){
+  query.bathroomNumber=bathroomNumber;
+  }
+  if(propType){
+  query.propType=propType;
+  }
+  if(amenities){
+  query.amenities={$all: amenities};
+  }
+  if(maxPrice){
+  query.maxPrice={$lte: maxPrice};
+  }
+  //find query object in mongodb
+  try{
+  constresult=awaitListing.find(query);
+  res.json(result);
+  }catch(err){
+  console.error(err);
+  res.status(500).send('server error')
+  }
+ })
+
+
   // LISTING CREATE ROUTE
   router.post("/", async (req, res) => {
     try {   
