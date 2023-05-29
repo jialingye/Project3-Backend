@@ -1,95 +1,91 @@
+
 const express = require('express');
+
 const router = express.Router();
-const mongoose = require('mongoose');
 const User = require('../models/user');
+
 const bcrypt = require('bcryptjs');
+const jwt  = require('jsonwebtoken');
+const mongoose = require('mongoose');
+
 require("dotenv").config();
+
 const {SALT} = process.env;
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 let failedLogin;
 
+// signup post
+router.post('/signup', async (req, res) => {
+    try {
+        //hashing password
+        req.body.password = await bcrypt.hash(req.body.password, await bcrypt.genSalt(10));
 
+        // generate the user
+        const user = await User.create(req.body);
+
+        // response
+        res.json({status: "User Created"});
+
+    } catch (error){
+        res.status(400).json({error})
+    }
+
+})
 //login post route
-router.get('/login', (req, res) => {
-    res.send("log in");
-});
-
-
-router.post('/login', async(req, res, next) => {
-    try {
-        let user;
-        //find user exist
-        const userExists = await User.exists({email: req.body.email});
-        console.log(userExists)
+router.post('/login', async (req, res) => {
+    try{ 
         
-        //if exists, find the one in mongodb
-        if(userExists) {
-            user = await User.findOne({email: req.body.email});
-        } else {
-            failedLogin = "Your username or password didn't match"
-            return res.redirect('/user/login');
-        }
-        //if user match, compare password
-        const match = await bcrypt.compare(req.body.password, user.password);
-        //if password match, then create session
-        if(match) {
-            req.session.currentUser = {
-                id: user._id,
-                username: user.username
-            };
+        const {username, password } = req.body
+        // get the user 
+        
+        const user = await User.findOne({username});
+
+        if ( user ) {
             
-            res.redirect('/');
-        } else {
-            failedLogin = "Your username or password didn't match"
-            res.redirect('/login');
+            console.log(user)
+            console.log(password, user.password)
+            const passwordCheck = await bcrypt.compare(password, user.password)
+
+            if(passwordCheck){ // is `passwordCheck` is True 
+                
+                const payload = { username } 
+                // fetches logged in user's name each time they send a request. 
+                // creating a token    payload is first argument
+                //                     |________________________|
+                //                           |     |  SECRET is second argument
+                //                           |     |  |_______________________|
+                //                           |     |  |                 | 
+                const token = await jwt.sign(payload, process.env.SECRET);
+                
+                /*  
+                *   1: Create cookie `res.cookie()`
+                *   2: the first param option is the name of the cookie, `res.cookie('nameOfCookie')`
+                *   3: the second option is the `value` of the cookie, we're going to pass the `token` variable `res.cookie('token', token)`
+                *   4: and for the forth option we're going to set is {httpOnly: true} this is so the frontend cannot touch the cookie for secruity purposes. `res.cookie('token',token, {httpOnly: true})`
+                * 
+
+                 */
+                res.cookie('token', token, {httpOnly: true}).json({payload, status: "logged in"})
+            } else {
+                res.status(400).json({error:"Password does not match"})
+            }
+        }  else {   // `user` will be undefined if the {useranme} you're searching for doesnt exist 
+            res.status(400).json({error: "❌❌User🙅‍♀️🙅‍♂️ doesn't 🕳️ exist❕❌❌"})
         }
-    } catch(err) {
-        console.log(err);
-        next();
+        res.send("log in");
+    } catch (error) {
+
     }
-})
-
-//sign up route
-
-router.get('/signup', (req, res) => {
-    res.send("sign up");
 });
 
-router.post('/signup', async(req, res, next) => {
-    try {
-        //creat user and rounds of salt
-        const newUser = {
-            username: req.body.username,
-            email: req.body.email,
-            password: req.body.password
-          };
-        //creat hash on user password depends on SALT number
-        const rounds = SALT;
-        const salt = await bcrypt.genSalt(parseInt(rounds));
-        const hash = await bcrypt.hash(newUser.password, salt);
-
-        newUser.password = hash;
-        
-        //if user not already exist, create user
-        const existUser = await User.findOne({email: newUser.email});
-        if(existUser){
-             res.status(400).json({error: 'Email already exists'})
-        } else {
-            await User.create(newUser);
-            res.redirect('/user/login');
-        }
-    } catch(err) {
-        console.log(err);
-        next();
-    }
+// logout post
+router.post('/logout', async (req, res) => {
+    // res.clearCookie('NameOfCookie') will destroy the name of the cookie you pass into it, destroying the cookie logs the user out
+    // .json is just sending a response back letting the user know they're logged out. 
+    res.clearCookie('token').json({response: ' You are Logged Out ' }); 
 })
 
 
-//logout page
-router.get('/logout', (req, res) => {
-    req.session.destroy();
-    res.redirect('/');
-})
 
 module.exports = router;

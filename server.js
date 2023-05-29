@@ -8,24 +8,25 @@ const morgan = require("morgan");
 const mongoose = require("./models/connection");
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
-
+const CookieParser = require('cookie-parser')
 // middleWare
 app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
-app.use(
-    session({
-        store: MongoStore.create({
-            mongoUrl: MONGODB_URL
-        }),
-        secret: SECRET,
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            maxAge: 1000 * 60 * 60 * 24 * 30
-        }
-    })
-)
+app.use(CookieParser()); 
+// app.use(
+//     session({
+//         store: MongoStore.create({
+//             mongoUrl: MONGODB_URL
+//         }),
+//         secret: SECRET,
+//         resave: false,
+//         saveUninitialized: false,
+//         cookie: {
+//             maxAge: 1000 * 60 * 60 * 24 * 30
+//         }
+//     })
+// )
 
 //router
 const userRouter = require("./controllers/user");

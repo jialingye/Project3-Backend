@@ -41,8 +41,9 @@ router.post('/id', async (req, res) => {
 
 // POST  Create Review Route
 router.post('/', async (req,res) => {
-    
-    // console.log(req.body);
+    // attach user id to review 
+
+    console.log(req.body);
 
     // const { listing } = req.body;
     const newReview = await Review.create(req.body);
@@ -51,11 +52,12 @@ router.post('/', async (req,res) => {
     const PropertyListing = await Listing.findById(req.body.listing)
     // console.log(PropertyListing.reviews);
     PropertyListing.reviews.push(newReview.id);
+    console.log(PropertyListing);
     await PropertyListing.save();
 
     const reviewer = await User.findById(req.body.reviewer)
-    // console.log(req.body.reviewer);
-    // console.log(reviewer);
+    console.log(req.body.reviewer);
+    console.log(reviewer);
 
     reviewer.reviewsGiven.push(newReview.id);
     await reviewer.save();
