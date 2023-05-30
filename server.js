@@ -9,6 +9,7 @@ const mongoose = require("./models/connection");
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const Listing = require('./models/listing');
+const bodyParser = require('body-parser');
 
 // middleWare
 app.use(cors());
@@ -27,6 +28,9 @@ app.use(
         }
     })
 )
+
+// app.use(bodyParser.json({ limit: '10mb' }));
+// app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
 //router
 const userRouter = require("./controllers/user");
