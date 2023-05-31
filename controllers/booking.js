@@ -40,6 +40,34 @@ const router = express.Router();
     }
   });
 
+  // Get Income by HostId
+  router.get("/income/:id", async (req, res) =>{
+    try {
+      const hostId = req.params.id;
+
+      const bookings = await Booking.find({host: hostId })
+      const incomeBymonth = bookings.reduce((result, booking)=>{
+        const month=booking.startDate.getMonth();
+        const income = booking.totalPrice;
+
+        if(! result[month]){
+          result[month]= income
+        } else {
+          result[month]+=income
+        }
+        return result;
+
+      }, {})
+     const formattedIncome = Object.keys(incomeBymonth).map(month => ({
+      month: new Date (0, month),
+      income: incomeBymonth[month]
+     }))
+
+     res.json(formattedIncome)
+    } catch (error) {
+      res.status(400).json(error);
+    }
+  })
 
   // GET by id
 router.get("/:id", async (req, res) => {
