@@ -23,16 +23,19 @@ router.get("/", async (req, res) => {
   console.log(req.query)
   // Filter
   for (let key in req.query){
-		if(key == "price") {
-			console.log(`${key}=${req.query[key]}`)
-			req.query[key] = {$lte:req.query[key],$gte:0};
-		} else {
-      console.log(`${key}=${req.query[key]}`)
-			req.query[key] = {$gte:req.query[key]};
+    if(key === "price") {
+      console.log(`${key}=${req.query[key]}`,"first console.loggggg priceee")
+      req.query[key] = {$lte:req.query[key],$gte:0};
+    } else if(key === "amenities") {
+      console.log(`${key}=${req.query[key]}`, "second console.loggggg amenities")
+      const amenitiesArray =  req.query[key].split(",");
+      req.query[key] = {$all: amenitiesArray}
+    } else {
+      console.log(`${key}=${req.query[key]}`, "3 console.loggggg othersssssss")
+      req.query[key] = {$gte:req.query[key]};
     }
-	}
+  }
   console.log(req.query);  
-
   // Get all properties
   let properties;
   try {
@@ -43,6 +46,7 @@ router.get("/", async (req, res) => {
     res.status(400).json(error);
   }
 });
+
 
   //search 
   router.get('/search', async(req,res) =>{
