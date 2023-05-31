@@ -20,37 +20,23 @@ const router = express.Router();
 
 // LISTING INDEX ROUTE
 router.get("/", async (req, res) => {
+  console.log(req.query)
   // Filter
-  console.log("req.query-------------------------------",req.query)
-  const price = req.query.price
-  const bedroomNumber = req.query.bedroomNumber;
-  const bedNumber = req.query.bedNumber ;
-  const bathroomNumber = req.query.bathroomNumber;
-  if (price) {
-    const listingsPrice = await Listing.find({price:{$lte:price,$gte:0}})
-    console.log(listingsPrice)
-    return res.status(200).json(listingsPrice)
-  }
-  if (bedroomNumber) {
-    const listingsRoomNumber = await Listing.find({bedroomNumber:{$gte:bedroomNumber}})
-    console.log(listingsRoomNumber)
-    return res.status(200).json(listingsRoomNumber)
-  }
-  if (bedNumber) {
-    const listingsBedNumber = await Listing.find({bedNumber:{$gte:bedNumber}})
-    console.log(listingsBedNumber)
-    return res.status(200).json(listingsBedNumber)
-  }
-  if (bathroomNumber) {
-    const listingsbathroomNumber = await Listing.find({bathroomNumber:{$gte:bathroomNumber}})
-    console.log(listingsbathroomNumber)
-    return res.status(200).json(listingsbathroomNumber)
-  }
+  for (let key in req.query){
+		if(key == "price") {
+			console.log(`${key}=${req.query[key]}`)
+			req.query[key] = {$lte:req.query[key],$gte:0};
+		} else {
+      console.log(`${key}=${req.query[key]}`)
+			req.query[key] = {$gte:req.query[key]};
+    }
+	}
+  console.log(req.query);  
 
   // Get all properties
   let properties;
   try {
-    properties = await Listing.find({})
+    properties = await Listing.find(req.query)
     res.status(200).json(properties)
   } catch (error) {
     //send error
