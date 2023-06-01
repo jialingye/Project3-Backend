@@ -132,61 +132,111 @@ router.get('/filter',async(req,res)=>{
  })
 
 
-  // LISTING CREATE ROUTE
-  router.post("/", async (req, res) => {
-    try {   
-        // Get coordinates from adress
-        const locationResponse = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
-            req.body.address
-        )}&key=${GOOGLE_API_KEY}`)
+  // // Angela LISTING CREATE ROUTE
+  // router.post("/", async (req, res) => {
+  //   try {   
+  //       // Get coordinates from adress
+  //       const locationResponse = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+  //           req.body.address
+  //       )}&key=${GOOGLE_API_KEY}`)
 
-        const coordinates = locationResponse.data.results[0].geometry.location;
-        // console.log("----blablabal------")
-        // console.log(locationResponse.data.results[0])
-        // console.log(coordinates);
-        // console.log("----blablabal------")
+  //       const coordinates = locationResponse.data.results[0].geometry.location;
+  //       // console.log("----blablabal------")
+  //       // console.log(locationResponse.data.results[0])
+  //       // console.log(coordinates);
+  //       // console.log("----blablabal------")
 
-        const city = locationResponse.data.results[0].address_components.find(
-          (component) => component.types.includes('locality')
-        ).long_name;
-        // console.log(city)
-        const country = locationResponse.data.results[0].address_components.find(
-          (component) => component.types.includes('country')
-        ).long_name;
-        // console.log(country)
-        // Create the property in your database with the retrieved latitude and longitude
-        const newProperty = await Listing.create({
-            title: req.body.title,
-            images: req.body.images,
-            types: req.body.types,
-            price: req.body.price,
-            share: req.body.share,
-            address: req.body.address,
-            city: city,
-            country: country,
-            location: {
-                lat: coordinates.lat,
-                lng: coordinates.lng,
-              },
-            amenities: req.body.amenities,
-            guestNumber: req.body.guestNumber,
-            bedroomNumber: req.body.bedroomNumber,
-            bedNumber: req.body.bedNumber,
-            bathroomNumber: req.body.bathroomNumber,
-            host: req.body.host,
+  //       const city = locationResponse.data.results[0].address_components.find(
+  //         (component) => component.types.includes('locality')
+  //       ).long_name;
+  //       // console.log(city)
+  //       const country = locationResponse.data.results[0].address_components.find(
+  //         (component) => component.types.includes('country')
+  //       ).long_name;
+  //       // console.log(country)
+  //       // Create the property in your database with the retrieved latitude and longitude
+  //       const newProperty = await Listing.create({
+  //           title: req.body.title,
+  //           images: req.body.images,
+  //           types: req.body.types,
+  //           price: req.body.price,
+  //           share: req.body.share,
+  //           address: req.body.address,
+  //           city: city,
+  //           country: country,
+  //           location: {
+  //               lat: coordinates.lat,
+  //               lng: coordinates.lng,
+  //             },
+  //           amenities: req.body.amenities,
+  //           guestNumber: req.body.guestNumber,
+  //           bedroomNumber: req.body.bedroomNumber,
+  //           bedNumber: req.body.bedNumber,
+  //           bathroomNumber: req.body.bathroomNumber,
+  //           host: req.body.host,
+  //       });
+
+  //       const user = await User.findById(req.body.host);
+  //       user.listing.push(newProperty.id);
+  //       await user.save();
+
+  //       // Return the newly created property in the response
+  //       res.status(200).json({property: newProperty});
+  //   } catch (error) {
+  //       console.log(error)
+  //       res.status(400).json(error);
+  //   }
+  // });
+
+    // Jade LISTING CREATE ROUTE
+    router.post("/", async (req, res) => {
+      try {
+        const {default: fetch} = await import('node-fetch');
+        const {address, ... otherData} = req.body;
+        const apiKey = GOOGLE_API_KEY;
+        const geocodingUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`
+        
+        const response = await fetch(geocodingUrl);
+          const data = await response.json();
+          const {lat, lng} = data.results[0].geometry.location;
+  
+          const city = data.results[0].address_components.find(
+            (component) => component.types.includes('locality')
+          ).long_name;
+          // console.log(city)
+          const country = data.results[0].address_components.find(
+            (component) => component.types.includes('country')
+          ).long_name;
+      
+          //console.log(req.body)
+        const listing = await Listing.create({
+          address,
+          city,
+          country,
+          location: {
+            lat,
+            lng,
+          },
+          // host: req.session.currentUser.id,
+          ...otherData
         });
-
         const user = await User.findById(req.body.host);
-        user.listing.push(newProperty.id);
+        user.listing.push(listing.id)
         await user.save();
-
-        // Return the newly created property in the response
-        res.status(200).json({property: newProperty});
-    } catch (error) {
-        console.log(error)
-        res.status(400).json(error);
-    }
-  });
+  
+        
+  
+      res.json({property: listing});
+      } catch (error) {
+        if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({ error: validationErrors });
+      }
+      console.log(error)
+      // Handle other types of errors
+      return res.status(500).json({ error: 'Internal server error' });
+        }
+    });
 
 
 
