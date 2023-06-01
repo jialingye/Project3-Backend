@@ -24,7 +24,7 @@ router.post('/login', async(req, res, next) => {
         if(userExists) {
             user = await User.findOne({email: req.body.email});
         } else {
-            failedLogin = "Your username or password didn't match"
+            failedLogin = "❌❌User🙅‍♀️🙅‍♂️ doesn't 🕳️ exist❕❌❌"
             return res.status(401).json({error: failedLogin });
         }
         //if user match, compare password
