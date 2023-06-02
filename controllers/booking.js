@@ -160,7 +160,7 @@ router.get("/:id", async (req, res) => {
       //get the listing price
       const listingOb = await Listing.findById(listing);
       const {price,address,images,city, host} = listingOb; 
-      console.log(city)
+      //console.log(city)
       const image = images[0];
       //calculate the days of stay
       const start = new Date(startDate);
