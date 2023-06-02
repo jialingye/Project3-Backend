@@ -150,7 +150,7 @@ router.get("/:id", async (req, res) => {
 
       
 
-    res.json({listing});
+    res.json({property: listing});
     } catch (error) {
       if (error.name === 'ValidationError') {
     const validationErrors = Object.values(error.errors).map((err) => err.message);
