@@ -278,6 +278,20 @@ router.get('/filter',async(req,res)=>{
         res.status(400).json(error);
     }
 });
+  // SAVE
+  router.post("/:id/save", async (req, res) => {
+    try {
+      const user = await User.findById(req.body.host);
+      user.listing.push(listing.id)
+      await user.save();
+      
+
+        res.status(200).json(updatedListing);
+    } catch (error) {
+        console.log(error)
+        res.status(400).json(error);
+    }
+});
   
   // LISTING DELETE ROUTE
   router.delete("/:id", async (req, res) => {
