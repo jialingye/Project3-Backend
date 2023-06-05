@@ -112,6 +112,7 @@ router.get('/:id', async(req, res, next) => {
         .populate('listing')
         .populate('bookings')
         .populate('reviewsGiven')
+        .populate('savedListing')
 
         res.json(user)
     }catch (err){

@@ -6,8 +6,9 @@ const Listing = require("../models/listing");
 const Booking = require("../models/booking");
 const axios = require("axios");
 const User = require("../models/user");
+const jwt = require('jsonwebtoken');
 require("dotenv").config();
-const {GOOGLE_API_KEY} = process.env;
+const {GOOGLE_API_KEY, SECRET} = process.env;
 ///////////////////////////////
 
 /////////////////////////////////////////
@@ -78,7 +79,42 @@ router.get("/", async (req, res) => {
     res.status(500).send('server error')
   }
   })
-  
+
+// get saved listing
+router.get("/:id/save", async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ error: "Please provide a valid token" });
+    }
+
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(token, SECRET);
+      console.log("😫", decodedToken);
+
+      const userId = decodedToken.id;
+      if (!userId) {
+        return res.status(401).json({ error: "userId is not found." });
+      }
+
+      const user = await User.findById(userId);
+      const isSaved = user.savedListing.includes(req.params.id);
+      res.status(200).json({ isSaved });
+    } catch (error) {
+      console.log(error);
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(400).json(error);
+  }
+});
+
+
+
+
+
+
   // GET by id
   router.get("/:id", async (req, res) => {
     try {
@@ -132,113 +168,61 @@ router.get('/filter',async(req,res)=>{
  })
 
 
-  // // Angela LISTING CREATE ROUTE
-  // router.post("/", async (req, res) => {
-  //   try {   
-  //       // Get coordinates from adress
-  //       const locationResponse = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
-  //           req.body.address
-  //       )}&key=${GOOGLE_API_KEY}`)
+  // Angela LISTING CREATE ROUTE
+  router.post("/", async (req, res) => {
+    try {   
+        // Get coordinates from adress
+        const locationResponse = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+            req.body.address
+        )}&key=${GOOGLE_API_KEY}`)
 
-  //       const coordinates = locationResponse.data.results[0].geometry.location;
-  //       // console.log("----blablabal------")
-  //       // console.log(locationResponse.data.results[0])
-  //       // console.log(coordinates);
-  //       // console.log("----blablabal------")
+        const coordinates = locationResponse.data.results[0].geometry.location;
+        // console.log("----blablabal------")
+        // console.log(locationResponse.data.results[0])
+        // console.log(coordinates);
+        // console.log("----blablabal------")
 
-  //       const city = locationResponse.data.results[0].address_components.find(
-  //         (component) => component.types.includes('locality')
-  //       ).long_name;
-  //       // console.log(city)
-  //       const country = locationResponse.data.results[0].address_components.find(
-  //         (component) => component.types.includes('country')
-  //       ).long_name;
-  //       // console.log(country)
-  //       // Create the property in your database with the retrieved latitude and longitude
-  //       const newProperty = await Listing.create({
-  //           title: req.body.title,
-  //           images: req.body.images,
-  //           types: req.body.types,
-  //           price: req.body.price,
-  //           share: req.body.share,
-  //           address: req.body.address,
-  //           city: city,
-  //           country: country,
-  //           location: {
-  //               lat: coordinates.lat,
-  //               lng: coordinates.lng,
-  //             },
-  //           amenities: req.body.amenities,
-  //           guestNumber: req.body.guestNumber,
-  //           bedroomNumber: req.body.bedroomNumber,
-  //           bedNumber: req.body.bedNumber,
-  //           bathroomNumber: req.body.bathroomNumber,
-  //           host: req.body.host,
-  //       });
-
-  //       const user = await User.findById(req.body.host);
-  //       user.listing.push(newProperty.id);
-  //       await user.save();
-
-  //       // Return the newly created property in the response
-  //       res.status(200).json({property: newProperty});
-  //   } catch (error) {
-  //       console.log(error)
-  //       res.status(400).json(error);
-  //   }
-  // });
-
-    // Jade LISTING CREATE ROUTE
-    router.post("/", async (req, res) => {
-      try {
-        const {default: fetch} = await import('node-fetch');
-        const {address, ... otherData} = req.body;
-        const apiKey = GOOGLE_API_KEY;
-        const geocodingUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`
-        
-        const response = await fetch(geocodingUrl);
-          const data = await response.json();
-          const {lat, lng} = data.results[0].geometry.location;
-  
-          const city = data.results[0].address_components.find(
-            (component) => component.types.includes('locality')
-          ).long_name;
-          // console.log(city)
-          const country = data.results[0].address_components.find(
-            (component) => component.types.includes('country')
-          ).long_name;
-      
-          //console.log(req.body)
-        const listing = await Listing.create({
-          address,
-          city,
-          country,
-          location: {
-            lat,
-            lng,
-          },
-          // host: req.session.currentUser.id,
-          ...otherData
+        const city = locationResponse.data.results[0].address_components.find(
+          (component) => component.types.includes('locality')
+        ).long_name;
+        // console.log(city)
+        const country = locationResponse.data.results[0].address_components.find(
+          (component) => component.types.includes('country')
+        ).long_name;
+        // console.log(country)
+        // Create the property in your database with the retrieved latitude and longitude
+        const newProperty = await Listing.create({
+            title: req.body.title,
+            images: req.body.images,
+            types: req.body.types,
+            price: req.body.price,
+            share: req.body.share,
+            address: req.body.address,
+            city: city,
+            country: country,
+            location: {
+                lat: coordinates.lat,
+                lng: coordinates.lng,
+              },
+            amenities: req.body.amenities,
+            guestNumber: req.body.guestNumber,
+            bedroomNumber: req.body.bedroomNumber,
+            bedNumber: req.body.bedNumber,
+            bathroomNumber: req.body.bathroomNumber,
+            host: req.body.host,
         });
+
         const user = await User.findById(req.body.host);
-        user.listing.push(listing.id)
+        user.listing.push(newProperty.id);
         await user.save();
-  
-        
-  
-      res.json({property: listing});
-      } catch (error) {
-        if (error.name === 'ValidationError') {
-      const validationErrors = Object.values(error.errors).map((err) => err.message);
-      return res.status(400).json({ error: validationErrors });
-      }
-      console.log(error)
-      // Handle other types of errors
-      return res.status(500).json({ error: 'Internal server error' });
-        }
-    });
 
-
+        // Return the newly created property in the response
+        res.status(200).json({property: newProperty});
+    } catch (error) {
+        console.log(error)
+        res.status(400).json(error);
+    }
+  });
 
   
   // LISTING UPDATE ROUTE
@@ -281,18 +265,64 @@ router.get('/filter',async(req,res)=>{
   // SAVE
   router.post("/:id/save", async (req, res) => {
     try {
-      const user = await User.findById(req.body.host);
-      user.listing.push(listing.id)
+      const token = req.headers.authorization?.split(" ")[1];
+      if(!token){
+        return res.status(401).json({error: "Please provide a valid token"})
+      }
+      console.log("🤯",token)
+      const decodedToken = jwt.verify(token, SECRET);
+      console.log("🤯",decodedToken)
+      const userId = decodedToken.id;
+      
+      if(!userId){
+        return res.status(401).json({error: "userId is not found."})
+      }
+
+      const user = await User.findById(userId);
+      user.savedListing.push(req.params.id)
       await user.save();
       
-
-        res.status(200).json(updatedListing);
+      res.status(200).json({message:"Listing has been saved."});
     } catch (error) {
         console.log(error)
         res.status(400).json(error);
     }
 });
   
+  // Delete listing
+  router.delete("/:id/save", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.split(" ")[1];
+      if(!token){
+        return res.status(401).json({error: "Please provide a valid token"})
+      }
+
+      const decodedToken = jwt.verify(token, SECRET);
+      const userId = decodedToken.id;
+      
+      if(!userId){
+        return res.status(401).json({error: "userId is not found."})
+      }
+
+      const user = await User.findById(userId);
+      console.log("😉", user)
+      if(!user.savedListing.includes(req.params.id)){
+        return res
+          .status(400)
+          .json({error:"Listing is not saved by user"});
+      }
+    
+      user.savedListing.pull(req.params.id);
+      await user.save();
+
+    res.status(200).json({ message: "Listing removed from saved listings" });
+  
+    } catch (error) {
+        console.log(error)
+        res.status(400).json(error);
+    }
+});
+
   // LISTING DELETE ROUTE
   router.delete("/:id", async (req, res) => {
     try {
