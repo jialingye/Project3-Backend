@@ -182,10 +182,18 @@ router.get('/filter',async(req,res)=>{
         // console.log(coordinates);
         // console.log("----blablabal------")
 
-        const city = locationResponse.data.results[0].address_components.find(
-          (component) => component.types.includes('locality')
-        ).long_name;
+        // const city = locationResponse.data.results[0].address_components.find(
+        //   (component) => component.types.includes('locality')
+        // ).long_name;
         // console.log(city)
+        const typesToFind = ['locality', 'neighborhood', 'administrative_area_level_1'];
+        console.log(locationResponse.data.results[0].address_components)
+        const cityComponent = locationResponse.data.results[0].address_components.find(
+            (component) => typesToFind.some(type => component.types.includes(type))
+        );
+        
+        const city = cityComponent ? cityComponent.long_name : '';
+
         const country = locationResponse.data.results[0].address_components.find(
           (component) => component.types.includes('country')
         ).long_name;
@@ -234,10 +242,13 @@ router.get('/filter',async(req,res)=>{
         )}&key=${GOOGLE_API_KEY}`)
 
         const coordinates = locationResponse.data.results[0].geometry.location;
-
-        const city = locationResponse.data.results[0].address_components.find(
-          (component) => component.types.includes('locality')
-        ).long_name;
+        console.log(locationResponse.data.results[0].address_components)
+        const typesToFind = [ 'administrative_area_level_1', 'locality', 'neighborhood'];
+        const cityComponent = locationResponse.data.results[0].address_components.find(
+            (component) => typesToFind.some(type => component.types.includes(type))
+        );
+        
+        const city = cityComponent ? cityComponent.long_name : '';
         //console.log(city)
         const country = locationResponse.data.results[0].address_components.find(
           (component) => component.types.includes('country')
