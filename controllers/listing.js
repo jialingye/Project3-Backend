@@ -182,9 +182,12 @@ router.get('/filter',async(req,res)=>{
         // console.log(coordinates);
         // console.log("----blablabal------")
 
-        const city = locationResponse.data.results[0].address_components.find(
-          (component) => component.types.includes('locality')
-        ).long_name;
+        const cityComponent = locationResponse.data.results[0].address_components.find(
+          (component) =>
+            component.types.includes('locality') || component.types.includes('neighborhood')
+        );
+        
+        const city = cityComponent ? cityComponent.long_name : '';
         // console.log(city)
         const country = locationResponse.data.results[0].address_components.find(
           (component) => component.types.includes('country')
