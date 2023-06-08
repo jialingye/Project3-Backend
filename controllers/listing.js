@@ -177,10 +177,6 @@ router.get('/filter',async(req,res)=>{
         )}&key=${GOOGLE_API_KEY}`)
 
         const coordinates = locationResponse.data.results[0].geometry.location;
-        // console.log("----blablabal------")
-        // console.log(locationResponse.data.results[0])
-        // console.log(coordinates);
-        // console.log("----blablabal------")
 
         const typesToFind = ['locality', 'neighborhood', 'administrative_area_level_1'];
         console.log(locationResponse.data.results[0].address_components)

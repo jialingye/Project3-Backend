@@ -18,7 +18,7 @@ router.post('/login', async(req, res, next) => {
         let user;
         //find user exist
         const userExists = await User.exists({email: req.body.email});
-        console.log(userExists)
+        //console.log(userExists)
         
         //if exists, find the one in mongodb
         if(userExists) {
