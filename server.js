@@ -29,8 +29,8 @@ app.use(
     })
 )
 
-// app.use(bodyParser.json({ limit: '10mb' }));
-// app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
+// app.use(bodyParser.json({ limit: '200mb' }));
+// app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
 
 //router
 const userRouter = require("./controllers/user");

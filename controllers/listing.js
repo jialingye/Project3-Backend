@@ -91,7 +91,7 @@ router.get("/:id/save", async (req, res) => {
     let decodedToken;
     try {
       decodedToken = jwt.verify(token, SECRET);
-      console.log("😫", decodedToken);
+      //console.log("😫", decodedToken);
 
       const userId = decodedToken.id;
       if (!userId) {
@@ -182,10 +182,6 @@ router.get('/filter',async(req,res)=>{
         // console.log(coordinates);
         // console.log("----blablabal------")
 
-        // const city = locationResponse.data.results[0].address_components.find(
-        //   (component) => component.types.includes('locality')
-        // ).long_name;
-        // console.log(city)
         const typesToFind = ['locality', 'neighborhood', 'administrative_area_level_1'];
         console.log(locationResponse.data.results[0].address_components)
         const cityComponent = locationResponse.data.results[0].address_components.find(
@@ -276,13 +272,13 @@ router.get('/filter',async(req,res)=>{
   // SAVE
   router.post("/:id/save", async (req, res) => {
     try {
-      const token = req.headers.authorization?.split(" ")[1];
+      const token = req.headers.authorization.split(" ")[1];
       if(!token){
         return res.status(401).json({error: "Please provide a valid token"})
       }
-      console.log("🤯",token)
+
       const decodedToken = jwt.verify(token, SECRET);
-      console.log("🤯",decodedToken)
+      //console.log("🤯",decodedToken)
       const userId = decodedToken.id;
       
       if(!userId){
@@ -316,7 +312,7 @@ router.get('/filter',async(req,res)=>{
       }
 
       const user = await User.findById(userId);
-      console.log("😉", user)
+      //console.log("😉", user)
       if(!user.savedListing.includes(req.params.id)){
         return res
           .status(400)

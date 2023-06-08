@@ -29,6 +29,7 @@ router.post('/login', async(req, res, next) => {
         }
         //if user match, compare password
         const match = await bcrypt.compare(req.body.password, user.password);
+        console.log("😇",user.id, "🥹",user.username)
         //if password match, then create session
         if(match) {
             const token = jwt.sign(
