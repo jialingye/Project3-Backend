@@ -12,9 +12,8 @@ const Listing = require('./models/listing');
 const bodyParser = require('body-parser');
 
 // middleWare
-app.use(cors());
+
 app.use(morgan("dev"));
-app.use(express.json());
 app.use(
     session({
         store: MongoStore.create({
@@ -29,9 +28,9 @@ app.use(
     })
 )
 
-// app.use(bodyParser.json({ limit: '200mb' }));
-// app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
-
+app.use(bodyParser.json({ limit: '200mb' }));
+app.use(express.urlencoded({ limit: '200mb', extended: false }));
+app.use(cors());
 //router
 const userRouter = require("./controllers/user");
 const bookingRouter = require("./controllers/booking");

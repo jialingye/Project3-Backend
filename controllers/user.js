@@ -4,10 +4,11 @@ const mongoose = require('mongoose');
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 require("dotenv").config();
-const {SALT,SECRET} = process.env;
+const {SALT,SECRET,IMGBB_API_KEY} = process.env;
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const jwt = require('jsonwebtoken');
+const imgbbUploader = require("imgbb-uploader");
 let failedLogin;
 
 
@@ -124,11 +125,24 @@ router.get('/:id', async(req, res, next) => {
 //update user
   router.put("/:id", async (req, res) => {
     try {
+        const {image} = req.body
+        const bbOptions = {
+            apiKey: IMGBB_API_KEY,
+            base64string: image,
+        }
+       
+        const imageResponse = await imgbbUploader(bbOptions);
+        console.log(imageResponse.url)
+        const profileContent = {
+            ...req.body,
+            image: imageResponse.url
+        }
         res.json(
-          await User.findByIdAndUpdate(req.params.id,req.body, { new: true })
+          await User.findByIdAndUpdate(req.params.id,profileContent, { new: true })
         );
       } catch (error) {
         //send error
+        console.log(error)
         res.status(400).json(error);
       }
   });
